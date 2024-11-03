@@ -4,10 +4,10 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image 
 const Homepage = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Greeting */}
+      {}
       <Text style={styles.title}>Hello, Human!</Text>
 
-      {/* Notification */}
+      {}
       <View style={styles.notificationBox}>
         <Text style={styles.notificationText}>
         Belanja perlengkapan hewan <Text style={styles.highlight}>lebih mudah, langsung dari rumah!</Text>
@@ -15,14 +15,14 @@ const Homepage = ({ navigation }) => {
         <Image source={require('../../../source/gambar/kucing.png')} style={styles.kucing} />
       </View>
 
-      {/* Search Bar */}
+      {}
       <TextInput
         style={styles.searchBar}
         placeholder="Search"
         placeholderTextColor="#B0B0B0"
       />
 
-      {/* Category */}
+      {}
       <View style={styles.categoryContainer}>
         <Text style={styles.categoryTitle}>Category</Text>
         <TouchableOpacity>
@@ -37,16 +37,16 @@ const Homepage = ({ navigation }) => {
         ))}
       </View>
 
-      {/* Product List */}
+      {}
       <View style={styles.productRow}>
-        {/* Product 1 */}
+        {}
         <TouchableOpacity style={styles.productBox}>
           <Image source={require('../../../source/gambar/rcktn.png')} style={styles.productImage} />
           <Text style={styles.productTitle}>Royal Canin Kitten 1 kg</Text>
           <Text style={styles.productPrice}>Rp 250.000</Text>
         </TouchableOpacity>
 
-        {/* Product 2 */}
+        {}
         <TouchableOpacity style={styles.productBox}>
           <Image source={require('../../../source/gambar/rckper.png')} style={styles.productImage} />
           <Text style={styles.productTitle}>Royal Canin Persian 1 kg</Text>
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#757EFA',
     borderRadius: 10,
     marginBottom: 20,
-    overflow: 'hidden', // Tambahkan ini untuk memastikan konten tidak keluar dari kotak
+    overflow: 'hidden', 
 },
   notificationText: {
     flex: 1,
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   },
   categoryButtons: {
     flexDirection: 'row',
-    // Hilangkan flexWrap jika sudah ada di sini
+
    },
   categoryButton: {
     backgroundColor: '#E0E7FF',
@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 15,
     marginRight: 10,
-        // marginBottom: 10, // Hapus jika ada untuk menghindari jarak vertikal
+       
     },
 
   categoryText: {
@@ -161,11 +161,11 @@ const styles = StyleSheet.create({
   kucing: {
     width: 190,
     height: 150,
-    marginLeft: 0,  // Ubah marginLeft menjadi 0
-    marginRight: 0, // Tambahkan marginRight menjadi 0 untuk menghindari jarak dari sisi kanan
-    marginTop: 0,   // Tambahkan marginTop menjadi 0 jika perlu
-    marginBottom: 0, // Tambahkan marginBottom menjadi 0 jika perlu
-    resizeMode: 'cover', // Ganti dengan 'cover' agar gambar tetap proporsional
+    marginLeft: 0, 
+    marginRight: 0, 
+    marginTop: 0,   
+    marginBottom: 0, 
+    resizeMode: 'cover', 
 },
 
 });

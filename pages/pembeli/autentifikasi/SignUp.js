@@ -22,7 +22,6 @@ const SignUp = ({ navigation }) => {
       console.log('User registered:', userCredential.user);
       navigation.navigate('SignIn');
     } catch (error) {
-      // Atur pesan error yang lebih baku
       if (error.message.includes('auth/invalid-email')) {
         setErrorMessage('Format email tidak valid.');
       } else if (error.message.includes('auth/email-already-in-use')) {
@@ -66,7 +65,7 @@ const SignUp = ({ navigation }) => {
         onChangeText={setPassword}
       />
       
-      {/* Tampilkan pesan error jika ada */}
+      {}
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>

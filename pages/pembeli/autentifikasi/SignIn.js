@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../../FirebaseConfig';  // Sesuaikan path import ini dengan konfigurasi Anda
+import { auth } from '../../../FirebaseConfig';  
 
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -10,12 +10,9 @@ const SignIn = ({ navigation }) => {
 
   const handleSignIn = async () => {
     try {
-      // Gunakan Firebase Auth untuk login
       await signInWithEmailAndPassword(auth, email, password);
-      // Jika login berhasil, navigasikan ke halaman utama
       navigation.navigate('Homepage');
     } catch (error) {
-      // Set pesan kesalahan jika login gagal
       if (error.message.includes('auth/invalid-email')) {
         setErrorMessage('Format email tidak valid.');
       } else if (error.message.includes('auth/user-not-found')) {
@@ -35,7 +32,7 @@ const SignIn = ({ navigation }) => {
       <View style={styles.circleTopLeft} />
       <View style={styles.circleBottomRight} />
 
-      {/* Input fields */}
+      {}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -53,10 +50,10 @@ const SignIn = ({ navigation }) => {
         onChangeText={setPassword}
       />
 
-      {/* Error message */}
+      {}
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      {/* Role selection between Buyer and Seller */}
+      {}
       <View style={styles.roleContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.linkText}>Pembeli</Text>
@@ -67,12 +64,12 @@ const SignIn = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Login button */}
+      {}
       <TouchableOpacity style={styles.button} onPress={handleSignIn}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      {/* Footer for account registration */}
+      {}
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Belum punya akun?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
@@ -83,7 +80,6 @@ const SignIn = ({ navigation }) => {
   );
 };
 
-// Styles remain the same
 const styles = StyleSheet.create({
   container: {
     flex: 1,
