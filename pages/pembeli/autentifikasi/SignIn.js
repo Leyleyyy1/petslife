@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../../FirebaseConfig';  
+import { auth } from '../../../FirebaseConfig';
 
 const SignIn = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -13,11 +13,9 @@ const SignIn = ({ navigation }) => {
       await signInWithEmailAndPassword(auth, email, password);
       navigation.navigate('Homepage');
     } catch (error) {
-      if (error.message.includes('auth/invalid-email')) {
-        setErrorMessage('Format email tidak valid.');
-      } else if (error.message.includes('auth/user-not-found')) {
+      if (error.code === 'auth/user-not-found') {
         setErrorMessage('Pengguna tidak ditemukan, silakan periksa kembali email yang Anda masukkan.');
-      } else if (error.message.includes('auth/wrong-password')) {
+      } else if (error.code === 'auth/wrong-password') {
         setErrorMessage('Kata sandi yang Anda masukkan salah.');
       } else {
         setErrorMessage('Terjadi kesalahan. Silakan coba lagi.');
@@ -32,7 +30,6 @@ const SignIn = ({ navigation }) => {
       <View style={styles.circleTopLeft} />
       <View style={styles.circleBottomRight} />
 
-      {}
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -50,10 +47,8 @@ const SignIn = ({ navigation }) => {
         onChangeText={setPassword}
       />
 
-      {}
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
-      {}
       <View style={styles.roleContainer}>
         <TouchableOpacity onPress={() => navigation.navigate('SignIn')}>
           <Text style={styles.linkText}>Pembeli</Text>
@@ -64,12 +59,10 @@ const SignIn = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {}
       <TouchableOpacity style={styles.button} onPress={handleSignIn}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
-      {}
       <View style={styles.footerContainer}>
         <Text style={styles.footerText}>Belum punya akun?</Text>
         <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
@@ -101,7 +94,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginTop: 40,
     marginBottom: 40,
-    marginLeft: -80,
+    left: -25,
   },
   input: {
     width: '100%',

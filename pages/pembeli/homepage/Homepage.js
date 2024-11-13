@@ -10,7 +10,7 @@ const Homepage = ({ navigation }) => {
       {}
       <View style={styles.notificationBox}>
         <Text style={styles.notificationText}>
-        Belanja perlengkapan hewan <Text style={styles.highlight}>lebih mudah, langsung dari rumah!</Text>
+          Belanja perlengkapan hewan <Text style={styles.highlight}>lebih mudah, langsung dari rumah!</Text>
         </Text>
         <Image source={require('../../../source/gambar/kucing.png')} style={styles.kucing} />
       </View>
@@ -39,18 +39,28 @@ const Homepage = ({ navigation }) => {
 
       {}
       <View style={styles.productRow}>
-        {}
         <TouchableOpacity style={styles.productBox}>
           <Image source={require('../../../source/gambar/rcktn.png')} style={styles.productImage} />
           <Text style={styles.productTitle}>Royal Canin Kitten 1 kg</Text>
           <Text style={styles.productPrice}>Rp 250.000</Text>
         </TouchableOpacity>
-
-        {}
         <TouchableOpacity style={styles.productBox}>
           <Image source={require('../../../source/gambar/rckper.png')} style={styles.productImage} />
           <Text style={styles.productTitle}>Royal Canin Persian 1 kg</Text>
           <Text style={styles.productPrice}>Rp 270.000</Text>
+        </TouchableOpacity>
+      </View>
+
+      {}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity onPress={() => navigation.navigate('Keranjang')}>
+          <Image source={require('../../../source/gambar/keranjang.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Image source={require('../../../source/gambar/homeicon.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('ProfilPembeli')}>
+          <Image source={require('../../../source/gambar/user.png')} style={styles.icon} />
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -77,12 +87,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 20,
     overflow: 'hidden', 
-},
+  },
   notificationText: {
     flex: 1,
     color: '#ffffff',
     fontSize: 16,
-    marginLeft : 10,
+    marginLeft: 10,
   },
   highlight: {
     fontWeight: 'bold',
@@ -113,17 +123,14 @@ const styles = StyleSheet.create({
   },
   categoryButtons: {
     flexDirection: 'row',
-
-   },
+  },
   categoryButton: {
     backgroundColor: '#E0E7FF',
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 15,
     marginRight: 10,
-       
-    },
-
+  },
   categoryText: {
     color: '#333333',
     fontSize: 14,
@@ -139,7 +146,7 @@ const styles = StyleSheet.create({
     width: '48%',
     alignItems: 'center',
     marginBottom: 10,
-    marginTop :20,
+    marginTop: 20,
   },
   productImage: {
     width: 80,
@@ -161,13 +168,25 @@ const styles = StyleSheet.create({
   kucing: {
     width: 190,
     height: 150,
-    marginLeft: 0, 
-    marginRight: 0, 
-    marginTop: 0,   
-    marginBottom: 0, 
-    resizeMode: 'cover', 
-},
-
+    resizeMode: 'cover',
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  icon: {
+    width: 23,
+    height: 23,
+    resizeMode: 'contain',
+  },
 });
 
 export default Homepage;

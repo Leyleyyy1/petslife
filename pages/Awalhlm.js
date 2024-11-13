@@ -15,17 +15,12 @@ const Awalhlm = ({ navigation }) => {
       <View style={styles.circleTopLeft} />    
       <View style={styles.circleBottomRight} />
 
-      <TouchableOpacity
-        style={styles.buttonLeft}
-        onPress={() => navigation.navigate('SignIn')}>
-        <Text style={styles.buttonText}>Sign In</Text>
-      </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.buttonRight}
         onPress={() => navigation.navigate('SignUp')}
       >
-        <Text style={styles.buttonText}>Sign Up</Text>
+        <Text style={styles.buttonText}>Get Started</Text>
       </TouchableOpacity>
     </View>
   );
@@ -56,24 +51,14 @@ const styles = StyleSheet.create({
     width: 450,
     height: 450,
     marginTop: 220,
-    left:-10,
-  },
-  buttonLeft: { 
-    position: 'absolute',
-    left: 40,
-    bottom: 100,
-    backgroundColor: '6046A7',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 20,
+    left:-20,
   },
   buttonRight: {
     position: 'absolute',
-    right: 40,
-    bottom: 100,
-    backgroundColor: '6046A7',
+    top :670,
+    backgroundColor: 'rgb(96, 70, 167)',
     paddingVertical: 15,
-    paddingHorizontal: 30,
+    paddingHorizontal: 100,
     borderRadius: 20,
   },
   buttonText: {

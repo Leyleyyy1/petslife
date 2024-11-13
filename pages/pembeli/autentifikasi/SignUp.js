@@ -4,13 +4,34 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../FirebaseConfig.js';
 
 const SignUp = ({ navigation }) => {
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+  });
+
   const [errorMessage, setErrorMessage] = useState('');
+  const handleInputChange = (name, value) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleAuthError = (error) => {
+    if (error.message.includes('auth/invalid-email')) {
+      return 'Format email tidak valid.';
+    } else if (error.message.includes('auth/email-already-in-use')) {
+      return 'Email ini sudah terdaftar, gunakan email lain.';
+    } else if (error.message.includes('auth/weak-password')) {
+      return 'Kata sandi terlalu lemah, gunakan kata sandi yang lebih kuat.';
+    }
+    return 'Terjadi kesalahan. Silakan coba lagi.';
+  };
 
   const handleSignUp = async () => {
     setErrorMessage('');
+    const { fullName, email, password } = formData;
 
     if (!fullName || !email || !password) {
       setErrorMessage('Silakan lengkapi semua kolom yang tersedia.');
@@ -22,15 +43,7 @@ const SignUp = ({ navigation }) => {
       console.log('User registered:', userCredential.user);
       navigation.navigate('SignIn');
     } catch (error) {
-      if (error.message.includes('auth/invalid-email')) {
-        setErrorMessage('Format email tidak valid.');
-      } else if (error.message.includes('auth/email-already-in-use')) {
-        setErrorMessage('Email ini sudah terdaftar, gunakan email lain.');
-      } else if (error.message.includes('auth/weak-password')) {
-        setErrorMessage('Kata sandi terlalu lemah, gunakan kata sandi yang lebih kuat.');
-      } else {
-        setErrorMessage('Terjadi kesalahan. Silakan coba lagi.');
-      }
+      setErrorMessage(handleAuthError(error));
     }
   };
 
@@ -45,27 +58,26 @@ const SignUp = ({ navigation }) => {
         style={styles.input}
         placeholder="Nama Lengkap"
         placeholderTextColor="#FFFFFF"
-        value={fullName}
-        onChangeText={setFullName}
+        value={formData.fullName}
+        onChangeText={(text) => handleInputChange('fullName', text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
         placeholderTextColor="#FFFFFF"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        value={formData.email}
+        onChangeText={(text) => handleInputChange('email', text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#FFFFFF"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        value={formData.password}
+        onChangeText={(text) => handleInputChange('password', text)}
       />
       
-      {}
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
 
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
@@ -103,7 +115,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginTop: 40,
     marginBottom: 40,
-    marginLeft: -140,
+    left: -40,
   },
   input: {
     width: '100%',
