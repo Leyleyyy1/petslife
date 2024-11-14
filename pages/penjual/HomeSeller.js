@@ -1,60 +1,113 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import { Ionicons } from '@expo/vector-icons'; // Import Ionicons from Expo Icons
 
 const HomeSeller = ({ navigation }) => {
-  const handleLogout = () => {
-    navigation.navigate('LoginPenjual'); 
-  };
-
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcomeText}>Seller Dashboard</Text>
-      
-      {}
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Welcome, Seller!</Text>
 
-      <TouchableOpacity style={styles.button} onPress={handleLogout}>
-        <Text style={styles.buttonText}>Kembali</Text>
-      </TouchableOpacity>
-    </View>
+      <View style={styles.notificationBox}>
+        <Image source={require('../../source/gambar/Seller.png')} style={styles.productIcon} />
+      </View>
+
+      <View style={styles.managementContainer}>
+        <TouchableOpacity 
+          style={styles.managementBox} 
+          onPress={() => navigation.navigate('ManageProduk')}
+        >
+          <Ionicons name="pricetag" size={45} color="#333333" style={styles.managementIcon} />
+          <Text style={styles.managementText}>Produk</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.managementBox} 
+          onPress={() => navigation.navigate('Pesanan')}
+        >
+          <Ionicons name="receipt" size={45} color="#333333" style={styles.managementIcon} />
+          <Text style={styles.managementText}>Pesanan</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.managementContainer}>
+        <TouchableOpacity 
+          style={styles.managementBox} 
+          onPress={() => navigation.navigate('RiwayatPenjualan')}
+        >
+          <Ionicons name="stats-chart" size={45} color="#333333" style={styles.managementIcon} />
+          <Text style={styles.managementText}>Riwayat</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={styles.managementBox} 
+          onPress={() => navigation.navigate('ProfilPenjual')}
+        >
+          <Ionicons name="person-circle" size={45} color="#333333" style={styles.managementIcon} />
+          <Text style={styles.managementText}>Profil</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#757EFA',
+    flexGrow: 1,
     padding: 20,
+    backgroundColor: '#F5F7FA',
   },
-  welcomeText: {
-    fontSize: 24,
+  title: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 20,
+    color: '#2C2E3A',
+    marginBottom: 25,
+    marginTop: 40,
   },
-  subText: {
-    fontSize: 16,
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 40,
-  },
-  button: {
-    width: '100%',
-    height: 50,
-    borderRadius: 10,
-    backgroundColor: '#6640FD',
+  notificationBox: {
+    flexDirection: 'column', // Mengatur layout ke arah kolom
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
+    alignItems: 'center', // Menempatkan konten di tengah
+    backgroundColor: '#757EFA',
+    borderRadius: 12,
+    padding: 15,
+    marginBottom: 25,
+  
   },
-  buttonText: {
-    color: '#FFFFFF',
+  notificationText: {
+    marginTop: 10,
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#FFFFFF',
   },
+  managementContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  managementBox: {
+    backgroundColor: '#FFFFFF',
+    padding: 40,
+    borderRadius: 10,
+    width: '48%',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  managementIcon: {
+    marginBottom: 50,
+
+  },
+  managementText: {
+    fontSize: 13,
+    fontWeight: 'bold',
+    color: '#333333',
+  },
+  productIcon: {
+    width: 150,
+    height: 150,
+  }
 });
 
 export default HomeSeller;
