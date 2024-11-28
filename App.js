@@ -9,7 +9,7 @@ import LoginPenjual from './pages/penjual/LoginPenjual';
 import Keranjang from './pages/pembeli/homepage/Keranjang';
 import ProfilPembeli from './pages/pembeli/homepage/ProfilPembeli';
 import HomeSeller from './pages/penjual/HomeSeller';
-import ManageProduk from './pages/penjual/ManageProduk';
+import ManageProduk from './pages/penjual/manageProduk/ManageProduk';
 import RiwayatPenjualan from './pages/penjual/RiwayatPenjualan';
 import ProfilPenjual from './pages/penjual/ProfilPenjual';
 import Pesanan from './pages/penjual/Pesanan';
