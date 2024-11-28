@@ -1,42 +1,45 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { db } from '../../../FirebaseConfig';  // Pastikan untuk mengimpor konfigurasi Firebase Anda
+import { collection, addDoc } from 'firebase/firestore';  // Mengimpor fungsi untuk menambahkan data ke Firestore
 
-const ManageProduk = () => {
+const AddProduk = () => {
   const [namaProduk, setNamaProduk] = useState('');
   const [jenisProduk, setJenisProduk] = useState('');
   const [hargaProduk, setHargaProduk] = useState('');
   const [stokProduk, setStokProduk] = useState('');
   const [deskripsiProduk, setDeskripsiProduk] = useState('');
-  const [imageUri, setImageUri] = useState(null);
 
-  const handleUploadImage = () => {
-    launchImageLibrary({}, (response) => {
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.errorMessage) {
-        console.log('Image Picker Error: ', response.errorMessage);
-      } else {
-        setImageUri(response.assets[0].uri);
-      }
-    });
-  };
-
-  const handleSubmit = () => {
-    if (!namaProduk || !jenisProduk || !hargaProduk || !stokProduk || !deskripsiProduk || !imageUri) {
-      Alert.alert('Error', 'Harap lengkapi semua field dan upload gambar!');
+  // Fungsi untuk mengirim data ke Firestore
+  const handleSubmit = async () => {
+    if (!namaProduk || !jenisProduk || !hargaProduk || !stokProduk || !deskripsiProduk) {
+      Alert.alert('Error', 'Harap lengkapi semua field!');
       return;
     }
-    console.log({
-      namaProduk,
-      jenisProduk,
-      hargaProduk,
-      stokProduk,
-      deskripsiProduk,
-      imageUri,
-    });
-    Alert.alert('Sukses', 'Produk berhasil ditambahkan!');
+
+    try {
+      // Menambahkan data ke Firestore
+      await addDoc(collection(db, 'products'), {
+        namaProduk,
+        jenisProduk,
+        hargaProduk: parseFloat(hargaProduk),
+        stokProduk: parseInt(stokProduk),
+        deskripsiProduk,
+        createdAt: new Date(),  // Menambahkan timestamp
+      });
+
+      Alert.alert('Sukses', 'Produk berhasil ditambahkan!');
+      // Reset form setelah berhasil disimpan
+      setNamaProduk('');
+      setJenisProduk('');
+      setHargaProduk('');
+      setStokProduk('');
+      setDeskripsiProduk('');
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      Alert.alert('Error', 'Gagal menambahkan produk. Silakan coba lagi.');
+    }
   };
 
   return (
@@ -96,15 +99,6 @@ const ManageProduk = () => {
         placeholderTextColor="#aaa"
       />
 
-      <Text style={styles.label}>Upload Gambar</Text>
-      <TouchableOpacity style={styles.imageUploader} onPress={handleUploadImage}>
-        {imageUri ? (
-          <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-        ) : (
-          <Text style={styles.imageUploaderText}>Klik untuk upload gambar</Text>
-        )}
-      </TouchableOpacity>
-
       <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
         <Text style={styles.submitButtonText}>Tambah Produk</Text>
       </TouchableOpacity>
@@ -122,6 +116,7 @@ const styles = StyleSheet.create({
     fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
+    marginTop: 30,
     textAlign: 'center',
     color: '#757EFA',
   },
@@ -144,25 +139,6 @@ const styles = StyleSheet.create({
   textArea: {
     height: 50,
     textAlignVertical: 'top',
-  },
-  imageUploader: {
-    height: 80,
-    borderWidth: 1,
-    borderColor: '#757EFA',
-    borderRadius: 8,
-    marginBottom: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5F6FF',
-  },
-  imageUploaderText: {
-    color: '#777',
-    fontSize: 14,
-  },
-  imagePreview: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
   },
   submitButton: {
     backgroundColor: '#757EFA',
@@ -202,4 +178,4 @@ const pickerSelectStyles = {
   },
 };
 
-export default ManageProduk;
+export default AddProduk;

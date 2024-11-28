@@ -14,7 +14,7 @@ const HomeSeller = ({ navigation }) => {
       <View style={styles.managementContainer}>
         <TouchableOpacity 
           style={styles.managementBox} 
-          onPress={() => navigation.navigate('ManageProduk')}
+          onPress={() => navigation.navigate('ViewProduk')}
         >
           <Ionicons name="pricetag" size={45} color="#333333" style={styles.managementIcon} />
           <Text style={styles.managementText}>Produk</Text>
