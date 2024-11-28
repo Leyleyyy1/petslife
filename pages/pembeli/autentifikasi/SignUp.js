@@ -11,13 +11,13 @@ const SignUp = ({ navigation }) => {
   });
 
   const [errorMessage, setErrorMessage] = useState('');
+
   const handleInputChange = (name, value) => {
     setFormData((prevState) => ({
       ...prevState,
       [name]: value,
     }));
   };
-
   const handleAuthError = (error) => {
     if (error.message.includes('auth/invalid-email')) {
       return 'Format email tidak valid.';
@@ -29,12 +29,25 @@ const SignUp = ({ navigation }) => {
     return 'Terjadi kesalahan. Silakan coba lagi.';
   };
 
+  const isNotEmpty = (value) => value.trim() !== '';
+  const isEmailValid = (email) => /\S+@\S+\.\S+/.test(email);
+  const isPasswordStrong = (password) => password.length >= 6;
+
+  const validateInput = () => {
+    const { fullName, email, password } = formData;
+    return (
+      isNotEmpty(fullName) &&
+      isEmailValid(email) &&
+      isPasswordStrong(password)
+    );
+  };
+
   const handleSignUp = async () => {
     setErrorMessage('');
-    const { fullName, email, password } = formData;
+    const { email, password } = formData;
 
-    if (!fullName || !email || !password) {
-      setErrorMessage('Silakan lengkapi semua kolom yang tersedia.');
+    if (!validateInput()) {
+      setErrorMessage('Silakan lengkapi semua kolom yang tersedia dengan benar.');
       return;
     }
 

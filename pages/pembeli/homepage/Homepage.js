@@ -68,17 +68,17 @@ const Homepage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#F8F8F8',
+  container:{
+  flexGrow: 1,
+  padding: 20,
+  backgroundColor: '#F8F8F8',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333333',
-    marginBottom: 20,
-    marginTop: 40,
+  fontSize: 24,
+  fontWeight: 'bold',
+  color: '#333333',
+  marginBottom: 20,
+  marginTop: 40,
   },
   notificationBox: {
     flexDirection: 'row',
@@ -145,8 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '48%',
     alignItems: 'center',
-    marginBottom: 10,
-    marginTop: 20,
+    marginBottom: 10,marginTop: 20,
   },
   productImage: {
     width: 80,

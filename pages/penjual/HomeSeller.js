@@ -51,47 +51,23 @@ const HomeSeller = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#F5F7FA',
+  container: {flexGrow: 1,padding: 20,backgroundColor: '#F5F7FA',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#2C2E3A',
-    marginBottom: 25,
+  title: {fontSize: 28,fontWeight: 'bold',color: '#2C2E3A',marginBottom: 25,
     marginTop: 40,
   },
-  notificationBox: {
-    flexDirection: 'column', // Mengatur layout ke arah kolom
-    justifyContent: 'center',
-    alignItems: 'center', // Menempatkan konten di tengah
-    backgroundColor: '#757EFA',
-    borderRadius: 12,
-    padding: 15,
+  notificationBox: {flexDirection: 'column', justifyContent: 'center',
+    alignItems: 'center', backgroundColor: '#757EFA',borderRadius: 12,padding: 15,
     marginBottom: 25,
   
   },
-  notificationText: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: 'bold',
+  notificationText: {marginTop: 10,fontSize: 18,fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  managementContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+  managementContainer: {flexDirection: 'row',justifyContent: 'space-between',marginBottom: 10,
   },
-  managementBox: {
-    backgroundColor: '#FFFFFF',
-    padding: 40,
-    borderRadius: 10,
-    width: '48%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+  managementBox: {backgroundColor: '#FFFFFF',padding: 40,borderRadius: 10,width: '48%',
+    alignItems: 'center',shadowColor: '#000',shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
