@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Image, ScrollView } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { db } from '../../../FirebaseConfig';  // Pastikan untuk mengimpor konfigurasi Firebase Anda
-import { collection, addDoc } from 'firebase/firestore';  // Mengimpor fungsi untuk menambahkan data ke Firestore
+import { db } from '../../../FirebaseConfig';
+import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 
 const AddProduk = () => {
   const [namaProduk, setNamaProduk] = useState('');
@@ -10,8 +12,52 @@ const AddProduk = () => {
   const [hargaProduk, setHargaProduk] = useState('');
   const [stokProduk, setStokProduk] = useState('');
   const [deskripsiProduk, setDeskripsiProduk] = useState('');
+  const [imageUri, setImageUri] = useState(null);
 
-  // Fungsi untuk mengirim data ke Firestore
+  const navigation = useNavigation();
+  const route = useRoute();
+  const productId = route.params?.productId;
+
+  useEffect(() => {
+    if (productId) {
+      const fetchProduct = async () => {
+        try {
+          const productRef = doc(db, 'products', productId);
+          const productSnapshot = await getDoc(productRef);
+
+          if (productSnapshot.exists()) {
+            const productData = productSnapshot.data();
+            setNamaProduk(productData.namaProduk);
+            setJenisProduk(productData.jenisProduk);
+            setHargaProduk(productData.hargaProduk.toString());
+            setStokProduk(productData.stokProduk.toString());
+            setDeskripsiProduk(productData.deskripsiProduk);
+            setImageUri(productData.imageUri);
+          } else {
+            Alert.alert('Error', 'Produk tidak ditemukan.');
+          }
+        } catch (error) {
+          console.error('Error fetching product: ', error);
+          Alert.alert('Error', 'Gagal memuat data produk.');
+        }
+      };
+
+      fetchProduct();
+    }
+  }, [productId]);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImageUri(result.assets[0].uri);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!namaProduk || !jenisProduk || !hargaProduk || !stokProduk || !deskripsiProduk) {
       Alert.alert('Error', 'Harap lengkapi semua field!');
@@ -19,32 +65,42 @@ const AddProduk = () => {
     }
 
     try {
-      // Menambahkan data ke Firestore
-      await addDoc(collection(db, 'products'), {
-        namaProduk,
-        jenisProduk,
-        hargaProduk: parseFloat(hargaProduk),
-        stokProduk: parseInt(stokProduk),
-        deskripsiProduk,
-        createdAt: new Date(),  // Menambahkan timestamp
-      });
+      if (productId) {
+        const productRef = doc(db, 'products', productId);
+        await updateDoc(productRef, {
+          namaProduk,
+          jenisProduk,
+          hargaProduk: parseFloat(hargaProduk),
+          stokProduk: parseInt(stokProduk),
+          deskripsiProduk,
+          imageUri,
+        });
 
-      Alert.alert('Sukses', 'Produk berhasil ditambahkan!');
-      // Reset form setelah berhasil disimpan
-      setNamaProduk('');
-      setJenisProduk('');
-      setHargaProduk('');
-      setStokProduk('');
-      setDeskripsiProduk('');
+        Alert.alert('Sukses', 'Produk berhasil diperbarui!');
+      } else {
+        await addDoc(collection(db, 'products'), {
+          namaProduk,
+          jenisProduk,
+          hargaProduk: parseFloat(hargaProduk),
+          stokProduk: parseInt(stokProduk),
+          deskripsiProduk,
+          imageUri,
+          createdAt: new Date(),
+        });
+
+        Alert.alert('Sukses', 'Produk berhasil ditambahkan!');
+      }
+
+      navigation.goBack();
     } catch (error) {
-      console.error('Error adding document: ', error);
-      Alert.alert('Error', 'Gagal menambahkan produk. Silakan coba lagi.');
+      console.error('Error saving product: ', error);
+      Alert.alert('Error', 'Gagal menyimpan produk. Silakan coba lagi.');
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Tambah Produk</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.header}>{productId ? 'Edit Produk' : 'Tambah Produk'}</Text>
 
       <Text style={styles.label}>Nama Produk</Text>
       <TextInput
@@ -64,6 +120,7 @@ const AddProduk = () => {
           { label: 'Obat', value: 'Obat' },
           { label: 'Perlengkapan', value: 'Perlengkapan' },
         ]}
+        value={jenisProduk}
         style={pickerSelectStyles}
         placeholder={{ label: 'Pilih jenis produk', value: null }}
       />
@@ -99,16 +156,22 @@ const AddProduk = () => {
         placeholderTextColor="#aaa"
       />
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.submitButtonText}>Tambah Produk</Text>
+      <Text style={styles.label}>Gambar Produk</Text>
+      <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+        <Text style={styles.imageButtonText}>Pilih Gambar</Text>
       </TouchableOpacity>
-    </View>
+
+      {imageUri && <Image source={{ uri: imageUri }} style={styles.imagePreview} />}
+
+      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+        <Text style={styles.submitButtonText}>{productId ? 'Simpan Perubahan' : 'Tambah Produk'}</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: '#fff',
   },
@@ -137,8 +200,26 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   textArea: {
-    height: 50,
+    height: 100,
     textAlignVertical: 'top',
+  },
+  imageButton: {
+    backgroundColor: '#757EFA',
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  imageButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  imagePreview: {
+    width: '100%',
+    height: 200,
+    marginBottom: 15,
+    borderRadius: 8,
   },
   submitButton: {
     backgroundColor: '#757EFA',

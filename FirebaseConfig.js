@@ -3,6 +3,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, collection } from "firebase/firestore";
 
 
+
 const FirebaseConfig = {
     apiKey: "AIzaSyBgVkv9TyIGhNpDEPrzH3x0lcbHuVE2Yuw",
     authDomain: "petslife-131e3.firebaseapp.com",
@@ -16,6 +17,7 @@ const FirebaseConfig = {
 const app = initializeApp(FirebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
 
 const produkCollection = collection(db, 'produk');
 

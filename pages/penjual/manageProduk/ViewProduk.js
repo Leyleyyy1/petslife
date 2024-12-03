@@ -1,40 +1,69 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { db } from '../../../FirebaseConfig';  // Pastikan path FirebaseConfig sudah benar
-import { collection, getDocs } from 'firebase/firestore';
-import { useNavigation } from '@react-navigation/native'; // Untuk navigasi ke AddProduk
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
+import { db } from '../../../FirebaseConfig'; // Pastikan path FirebaseConfig sudah benar
+import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore'; // Menggunakan onSnapshot
+import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons'; // Untuk ikon
 
 const ViewProduk = () => {
   const [produkList, setProdukList] = useState([]);
-  const navigation = useNavigation();  // Hook untuk navigasi
+  const navigation = useNavigation();
 
-  // Mengambil data produk dari Firestore
   useEffect(() => {
-    const fetchProduk = async () => {
-      try {
-        const produkRef = collection(db, 'products');
-        const produkSnapshot = await getDocs(produkRef);
-        const produkData = produkSnapshot.docs.map((doc) => ({
+    const produkRef = collection(db, 'products');
+
+    // Menggunakan onSnapshot untuk sinkronisasi real-time
+    const unsubscribe = onSnapshot(
+      produkRef,
+      (snapshot) => {
+        const produkData = snapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
         setProdukList(produkData);
-      } catch (error) {
+      },
+      (error) => {
         console.error('Error fetching products: ', error);
-        Alert.alert('Error', 'Gagal memuat data produk');
+        Alert.alert('Error', 'Gagal memuat data produk.');
       }
-    };
+    );
 
-    fetchProduk();
+    // Membersihkan listener saat komponen di-unmount
+    return () => unsubscribe();
   }, []);
 
-  // Render item produk dalam list
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, 'products', id));
+      Alert.alert('Sukses', 'Produk berhasil dihapus.');
+    } catch (error) {
+      console.error('Error deleting product: ', error);
+      Alert.alert('Error', 'Gagal menghapus produk.');
+    }
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.productItem}>
-      <Text style={styles.productName}>{item.namaProduk}</Text>
-      <Text style={styles.productDetails}>Jenis: {item.jenisProduk}</Text>
-      <Text style={styles.productDetails}>Harga: Rp {item.hargaProduk}</Text>
-      <Text style={styles.productDetails}>Stok: {item.stokProduk}</Text>
+      {/* Menambahkan elemen Image untuk menampilkan gambar produk */}
+      {item.imageUri && (
+        <Image source={{ uri: item.imageUri }} style={styles.productImage} />
+      )}
+      <View style={styles.productInfo}>
+        <Text style={styles.productName}>{item.namaProduk}</Text>
+        <Text style={styles.productDetails}>Jenis: {item.jenisProduk}</Text>
+        <Text style={styles.productDetails}>Harga: Rp {item.hargaProduk}</Text>
+        <Text style={styles.productDetails}>Stok: {item.stokProduk}</Text>
+      </View>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('AddProduk', { productId: item.id })}
+        >
+          <Ionicons name="create-outline" size={24} color="#757EFA" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => handleDelete(item.id)}>
+          <Ionicons name="trash-outline" size={24} color="#FF6B6B" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -49,7 +78,6 @@ const ViewProduk = () => {
         contentContainerStyle={styles.productList}
       />
 
-      {/* Tombol untuk navigasi ke AddProduk */}
       <TouchableOpacity
         style={styles.addButton}
         onPress={() => navigation.navigate('AddProduk')}
@@ -74,7 +102,7 @@ const styles = StyleSheet.create({
     color: '#757EFA',
   },
   productList: {
-    marginBottom: 80, // Agar tombol tambah tidak tertutup
+    marginBottom: 80,
   },
   productItem: {
     backgroundColor: '#F5F6FF',
@@ -83,6 +111,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#757EFA',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  productInfo: {
+    flex: 1,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: 70,
   },
   productName: {
     fontSize: 18,

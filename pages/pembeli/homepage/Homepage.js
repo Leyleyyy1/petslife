@@ -1,13 +1,37 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { db } from '../../../FirebaseConfig'; // Pastikan path benar
+import { collection, onSnapshot } from 'firebase/firestore'; // Menggunakan onSnapshot
 
 const Homepage = ({ navigation }) => {
+  const [produkList, setProdukList] = useState([]);
+
+  useEffect(() => {
+    const produkRef = collection(db, 'products');
+
+    // Sinkronisasi data produk real-time
+    const unsubscribe = onSnapshot(
+      produkRef,
+      (snapshot) => {
+        const produkData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProdukList(produkData);
+      },
+      (error) => {
+        console.error('Error fetching products: ', error);
+        Alert.alert('Error', 'Gagal memuat data produk.');
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {}
       <Text style={styles.title}>Hello, Human!</Text>
 
-      {}
       <View style={styles.notificationBox}>
         <Text style={styles.notificationText}>
           Belanja perlengkapan hewan <Text style={styles.highlight}>lebih mudah, langsung dari rumah!</Text>
@@ -15,14 +39,12 @@ const Homepage = ({ navigation }) => {
         <Image source={require('../../../source/gambar/kucing.png')} style={styles.kucing} />
       </View>
 
-      {}
       <TextInput
         style={styles.searchBar}
         placeholder="Search"
         placeholderTextColor="#B0B0B0"
       />
 
-      {}
       <View style={styles.categoryContainer}>
         <Text style={styles.categoryTitle}>Category</Text>
         <TouchableOpacity>
@@ -37,21 +59,17 @@ const Homepage = ({ navigation }) => {
         ))}
       </View>
 
-      {}
+      {/* Bagian Produk */}
       <View style={styles.productRow}>
-        <TouchableOpacity style={styles.productBox}>
-          <Image source={require('../../../source/gambar/rcktn.png')} style={styles.productImage} />
-          <Text style={styles.productTitle}>Royal Canin Kitten 1 kg</Text>
-          <Text style={styles.productPrice}>Rp 250.000</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.productBox}>
-          <Image source={require('../../../source/gambar/rckper.png')} style={styles.productImage} />
-          <Text style={styles.productTitle}>Royal Canin Persian 1 kg</Text>
-          <Text style={styles.productPrice}>Rp 270.000</Text>
-        </TouchableOpacity>
+        {produkList.map((item) => (
+          <TouchableOpacity key={item.id} style={styles.productBox}>
+            <Image source={{ uri: item.imageUri }} style={styles.productImage} />
+            <Text style={styles.productTitle}>{item.namaProduk}</Text>
+            <Text style={styles.productPrice}>Rp {item.hargaProduk}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {}
       <View style={styles.bottomNav}>
         <TouchableOpacity onPress={() => navigation.navigate('Keranjang')}>
           <Image source={require('../../../source/gambar/keranjang.png')} style={styles.icon} />
@@ -68,17 +86,17 @@ const Homepage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-  flexGrow: 1,
-  padding: 20,
-  backgroundColor: '#F8F8F8',
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#F8F8F8',
   },
   title: {
-  fontSize: 24,
-  fontWeight: 'bold',
-  color: '#333333',
-  marginBottom: 20,
-  marginTop: 40,
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333333',
+    marginBottom: 20,
+    marginTop: 40,
   },
   notificationBox: {
     flexDirection: 'row',
@@ -86,7 +104,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#757EFA',
     borderRadius: 10,
     marginBottom: 20,
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
   notificationText: {
     flex: 1,
@@ -137,15 +155,17 @@ const styles = StyleSheet.create({
   },
   productRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
   productBox: {
     backgroundColor: '#FFFFFF',
-    padding: 0,
+    padding: 10,
     borderRadius: 10,
     width: '48%',
     alignItems: 'center',
-    marginBottom: 10,marginTop: 20,
+    marginBottom: 10,
+    marginTop: 20,
   },
   productImage: {
     width: 80,
