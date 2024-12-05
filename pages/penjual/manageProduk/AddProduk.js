@@ -6,6 +6,60 @@ import { collection, addDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
 
+// Pure function for validating inputs
+const isValidInput = (namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk) => {
+  return namaProduk && jenisProduk && hargaProduk && stokProduk && deskripsiProduk;
+};
+
+// Pure function for updating an existing product
+const updateProductData = async (productId, namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk, imageUri) => {
+  const productRef = doc(db, 'products', productId);
+  await updateDoc(productRef, {
+    namaProduk,
+    jenisProduk,
+    hargaProduk: parseFloat(hargaProduk),
+    stokProduk: parseInt(stokProduk),
+    deskripsiProduk,
+    imageUri,
+  });
+};
+
+// Pure function for adding a new product
+const addNewProduct = async (namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk, imageUri) => {
+  await addDoc(collection(db, 'products'), {
+    namaProduk,
+    jenisProduk,
+    hargaProduk: parseFloat(hargaProduk),
+    stokProduk: parseInt(stokProduk),
+    deskripsiProduk,
+    imageUri,
+    createdAt: new Date(),
+  });
+};
+
+// Pure function to fetch product data for editing
+const fetchProductData = async (productId, setNamaProduk, setJenisProduk, setHargaProduk, setStokProduk, setDeskripsiProduk, setImageUri) => {
+  try {
+    const productRef = doc(db, 'products', productId);
+    const productSnapshot = await getDoc(productRef);
+
+    if (productSnapshot.exists()) {
+      const productData = productSnapshot.data();
+      setNamaProduk(productData.namaProduk);
+      setJenisProduk(productData.jenisProduk);
+      setHargaProduk(productData.hargaProduk.toString());
+      setStokProduk(productData.stokProduk.toString());
+      setDeskripsiProduk(productData.deskripsiProduk);
+      setImageUri(productData.imageUri);
+    } else {
+      Alert.alert('Error', 'Produk tidak ditemukan.');
+    }
+  } catch (error) {
+    console.error('Error fetching product: ', error);
+    Alert.alert('Error', 'Gagal memuat data produk.');
+  }
+};
+
 const AddProduk = () => {
   const [namaProduk, setNamaProduk] = useState('');
   const [jenisProduk, setJenisProduk] = useState('');
@@ -18,31 +72,10 @@ const AddProduk = () => {
   const route = useRoute();
   const productId = route.params?.productId;
 
+  // useEffect to fetch product data if editing
   useEffect(() => {
     if (productId) {
-      const fetchProduct = async () => {
-        try {
-          const productRef = doc(db, 'products', productId);
-          const productSnapshot = await getDoc(productRef);
-
-          if (productSnapshot.exists()) {
-            const productData = productSnapshot.data();
-            setNamaProduk(productData.namaProduk);
-            setJenisProduk(productData.jenisProduk);
-            setHargaProduk(productData.hargaProduk.toString());
-            setStokProduk(productData.stokProduk.toString());
-            setDeskripsiProduk(productData.deskripsiProduk);
-            setImageUri(productData.imageUri);
-          } else {
-            Alert.alert('Error', 'Produk tidak ditemukan.');
-          }
-        } catch (error) {
-          console.error('Error fetching product: ', error);
-          Alert.alert('Error', 'Gagal memuat data produk.');
-        }
-      };
-
-      fetchProduct();
+      fetchProductData(productId, setNamaProduk, setJenisProduk, setHargaProduk, setStokProduk, setDeskripsiProduk, setImageUri);
     }
   }, [productId]);
 
@@ -59,35 +92,17 @@ const AddProduk = () => {
   };
 
   const handleSubmit = async () => {
-    if (!namaProduk || !jenisProduk || !hargaProduk || !stokProduk || !deskripsiProduk) {
+    if (!isValidInput(namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk)) {
       Alert.alert('Error', 'Harap lengkapi semua field!');
       return;
     }
 
     try {
       if (productId) {
-        const productRef = doc(db, 'products', productId);
-        await updateDoc(productRef, {
-          namaProduk,
-          jenisProduk,
-          hargaProduk: parseFloat(hargaProduk),
-          stokProduk: parseInt(stokProduk),
-          deskripsiProduk,
-          imageUri,
-        });
-
+        await updateProductData(productId, namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk, imageUri);
         Alert.alert('Sukses', 'Produk berhasil diperbarui!');
       } else {
-        await addDoc(collection(db, 'products'), {
-          namaProduk,
-          jenisProduk,
-          hargaProduk: parseFloat(hargaProduk),
-          stokProduk: parseInt(stokProduk),
-          deskripsiProduk,
-          imageUri,
-          createdAt: new Date(),
-        });
-
+        await addNewProduct(namaProduk, jenisProduk, hargaProduk, stokProduk, deskripsiProduk, imageUri);
         Alert.alert('Sukses', 'Produk berhasil ditambahkan!');
       }
 
@@ -243,7 +258,6 @@ const pickerSelectStyles = {
     paddingHorizontal: 15,
     marginBottom: 15,
     backgroundColor: '#F5F6FF',
-    fontSize: 16,
     color: '#333',
   },
   inputAndroid: {
@@ -254,7 +268,6 @@ const pickerSelectStyles = {
     paddingHorizontal: 15,
     marginBottom: 15,
     backgroundColor: '#F5F6FF',
-    fontSize: 16,
     color: '#333',
   },
 };

@@ -1,25 +1,60 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../../FirebaseConfig';
+import { auth } from '../../../FirebaseConfig.js';
 
 const SignIn = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+
   const [errorMessage, setErrorMessage] = useState('');
 
+  const handleInputChange = (name, value) => {
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleAuthError = (error) => {
+    switch (error.code) {
+      case 'auth/user-not-found':
+        return 'Pengguna tidak ditemukan, silakan periksa kembali email yang Anda masukkan.';
+      case 'auth/wrong-password':
+        return 'Kata sandi yang Anda masukkan salah.';
+      case 'auth/invalid-email':
+        return 'Format email tidak valid.';
+      default:
+        return 'Terjadi kesalahan. Silakan coba lagi.';
+    }
+  };
+  
+
+  const isNotEmpty = (value) => value.trim() !== '';
+  const isEmailValid = (email) => /\S+@\S+\.\S+/.test(email);
+
+  const validateInput = () => {
+    const { email, password } = formData;
+    return isNotEmpty(email) && isEmailValid(email) && isNotEmpty(password);
+  };
+
   const handleSignIn = async () => {
+    setErrorMessage('');
+    const { email, password } = formData;
+
+    if (!validateInput()) {
+      setErrorMessage('Silakan lengkapi semua kolom yang tersedia dengan benar.');
+      return;
+    }
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('User signed in:', userCredential.user);
       navigation.navigate('Homepage');
     } catch (error) {
-      if (error.code === 'auth/user-not-found') {
-        setErrorMessage('Pengguna tidak ditemukan, silakan periksa kembali email yang Anda masukkan.');
-      } else if (error.code === 'auth/wrong-password') {
-        setErrorMessage('Kata sandi yang Anda masukkan salah.');
-      } else {
-        setErrorMessage('Terjadi kesalahan. Silakan coba lagi.');
-      }
+      setErrorMessage(handleAuthError(error));
     }
   };
 
@@ -35,16 +70,16 @@ const SignIn = ({ navigation }) => {
         placeholder="Email"
         placeholderTextColor="#FFFFFF"
         keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
+        value={formData.email}
+        onChangeText={(text) => handleInputChange('email', text)}
       />
       <TextInput
         style={styles.input}
         placeholder="Password"
         placeholderTextColor="#FFFFFF"
         secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        value={formData.password}
+        onChangeText={(text) => handleInputChange('password', text)}
       />
 
       {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
@@ -163,6 +198,9 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red',
+    fontSize: 14,
+    textAlign: 'left',
+    width: '100%',
     marginBottom: 10,
   },
 });

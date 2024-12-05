@@ -90,6 +90,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#F8F8F8',
+    paddingBottom: 60, // Memberikan ruang ekstra untuk bottomNav
   },
   title: {
     fontSize: 24,
@@ -196,10 +197,11 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#E0E0E0',
     backgroundColor: '#FFFFFF',
-    position: 'absolute',
-    bottom: 0,
+    position: 'absolute', // Menetapkan posisi di bawah
+    bottom: 0, // Menetapkan posisi bawah
     left: 0,
     right: 0,
+    zIndex: 1, // Pastikan berada di atas konten lainnya
   },
   icon: {
     width: 23,

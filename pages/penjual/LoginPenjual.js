@@ -1,12 +1,49 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { db } from '../../FirebaseConfig';
+import { collection, getDocs } from 'firebase/firestore';
 
 const LoginPenjual = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    navigation.navigate('HomeSeller');
+  // Pure Function untuk memproses autentikasi
+  const authenticateAdmin = (admins, email, password) => {
+    return admins
+      .map(admin => ({ ...admin, email: admin.email.toLowerCase() })) // HOF: Normalize email
+      .filter(admin => admin.email && admin.password) // HOF: Filter valid data
+      .some(admin => admin.email === email.toLowerCase() && admin.password === password); // HOF: Check credentials
+  };
+
+  // Pure Function dengan rekursi untuk menghitung panjang dokumen
+  const countDocuments = (docs, count = 0) => {
+    if (docs.length === 0) return count;
+    return countDocuments(docs.slice(1), count + 1); // Rekursi
+  };
+
+  const handleLogin = async () => {
+    try {
+      const adminCollection = collection(db, 'admin');
+      const snapshot = await getDocs(adminCollection);
+
+      // Membuat array admin menggunakan spread operator
+      const admins = [...snapshot.docs.map(doc => doc.data())]; // HOF: map
+
+      const totalAdmins = countDocuments(admins); // Rekursi dipanggil
+      console.log(`Total Admins: ${totalAdmins}`);
+
+      // Function Composition: Proses autentikasi
+      const isAuthenticated = authenticateAdmin(admins, email, password);
+
+      if (isAuthenticated) {
+        navigation.navigate('HomeSeller');
+      } else {
+        Alert.alert('Login Gagal', 'Email atau password salah');
+      }
+    } catch (error) {
+      console.error('Error logging in: ', error);
+      Alert.alert('Error', 'Terjadi kesalahan. Silakan coba lagi.');
+    }
   };
 
   return (
@@ -37,10 +74,10 @@ const LoginPenjual = ({ navigation }) => {
           secureTextEntry
         />
         <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogin}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
+          style={styles.button}
+          onPress={handleLogin}>
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.forgotPasswordContainer}>
           <Text style={styles.forgotPasswordText}>Lupa Password?</Text>
@@ -54,6 +91,7 @@ const LoginPenjual = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  // Gaya tetap seperti semula
   container: {
     flex: 1,
     alignItems: 'center',

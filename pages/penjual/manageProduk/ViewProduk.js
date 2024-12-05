@@ -1,18 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Image } from 'react-native';
-import { db } from '../../../FirebaseConfig'; // Pastikan path FirebaseConfig sudah benar
-import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore'; // Menggunakan onSnapshot
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Image, TextInput } from 'react-native';
+import { db } from '../../../FirebaseConfig';
+import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons'; // Untuk ikon
+import { Ionicons } from '@expo/vector-icons';
 
-const ViewProduk = () => {
-  const [produkList, setProdukList] = useState([]);
-  const navigation = useNavigation();
+// Pure function untuk menyaring produk berdasarkan pencarian
+const filterProducts = (products, searchQuery) =>
+  products.filter((product) => product.namaProduk.toLowerCase().includes(searchQuery.toLowerCase()));
 
+// Pure function untuk menangani konfirmasi hapus produk
+const confirmDelete = (id, handleDelete) => {
+  Alert.alert(
+    'Konfirmasi Hapus',
+    'Apakah Anda yakin ingin menghapus produk ini?',
+    [
+      { text: 'Batal' },
+      { text: 'Hapus', onPress: () => handleDelete(id) },
+    ]
+  );
+};
+
+// Higher-order function untuk mengambil data produk dari Firestore
+const useProdukData = (setProdukList) => {
   useEffect(() => {
     const produkRef = collection(db, 'products');
-
-    // Menggunakan onSnapshot untuk sinkronisasi real-time
     const unsubscribe = onSnapshot(
       produkRef,
       (snapshot) => {
@@ -27,10 +39,17 @@ const ViewProduk = () => {
         Alert.alert('Error', 'Gagal memuat data produk.');
       }
     );
-
-    // Membersihkan listener saat komponen di-unmount
     return () => unsubscribe();
-  }, []);
+  }, [setProdukList]);
+};
+
+const ViewProduk = () => {
+  const [produkList, setProdukList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigation = useNavigation();
+
+  // Menggunakan custom hook untuk mengambil data produk
+  useProdukData(setProdukList);
 
   const handleDelete = async (id) => {
     try {
@@ -44,7 +63,6 @@ const ViewProduk = () => {
 
   const renderItem = ({ item }) => (
     <View style={styles.productItem}>
-      {/* Menambahkan elemen Image untuk menampilkan gambar produk */}
       {item.imageUri && (
         <Image source={{ uri: item.imageUri }} style={styles.productImage} />
       )}
@@ -60,19 +78,31 @@ const ViewProduk = () => {
         >
           <Ionicons name="create-outline" size={24} color="#757EFA" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleDelete(item.id)}>
+        <TouchableOpacity onPress={() => confirmDelete(item.id, handleDelete)}>
           <Ionicons name="trash-outline" size={24} color="#FF6B6B" />
         </TouchableOpacity>
       </View>
     </View>
   );
 
+  // Menggunakan fungsi map, filter dan spread operator dalam FP
+  const filteredProdukList = filterProducts(produkList, searchQuery); // Menggunakan filter dengan FP
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Daftar Produk</Text>
 
+      {/* Menambahkan komponen Search Bar */}
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Cari produk..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      {/* Rendering daftar produk dengan menggunakan fungsi renderItem */}
       <FlatList
-        data={produkList}
+        data={filteredProdukList}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.productList}
@@ -88,6 +118,7 @@ const ViewProduk = () => {
   );
 };
 
+// Style untuk tampilan
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -100,6 +131,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#757EFA',
+  },
+  searchInput: {
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#757EFA',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 20,
+    backgroundColor: '#F5F6FF',
+    color: '#333',
   },
   productList: {
     marginBottom: 80,
